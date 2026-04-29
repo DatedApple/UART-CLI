@@ -97,7 +97,23 @@ static void uart_init(void)
 
 static int read_line(char *buf, int len)
 {
+	int position = 0;
+	char c;
+	while (position < (len - 1)) {
+		c = read_one_byte_from_uart();
+		if (c == '\0') continue;
 
+		write_character_to_uart(c);
+
+		if(c == '\r' || c == '\n') break;
+
+		buf[position] = c;
+		position++;
+	}
+
+	buf[position] = '\0';
+	return position;
+}
 /*
 
 
@@ -128,7 +144,6 @@ M2: Convert this pseudocode to C:
 buffer[position] = '\0'  // Null terminate the string
 RETURN position
 */
-}
 
 // =========================
 //   CLI logic (M3/M4)
@@ -148,8 +163,13 @@ RETURN position
  */
 static void cli_print_help(void)
 {
-    // TODO: Implement this function
-    printf("TODO: Print help menu here\n");
+    // printing block of info above
+    printf("- help: show the help menu\n");
+    printf("- led on: turn LED on\n");
+    printf("- led off: turn LED off\n");
+    printf("- blink <ms>: blink LED with period <ms>\n");
+    printf("- status: show current LED state\n");
+    printf("- about: show information about your team/project\n");
 }
 
 /*
