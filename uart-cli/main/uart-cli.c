@@ -195,7 +195,27 @@ static void cli_print_help(void)
  *     and set st->mode to LED_MODE_BLINK with st->blink_ms = parsed value
  *
  */
-
+static void cli_blink_command(cli_state_t *st, const char *line)
+{
+    if (strncmp(line, "blink ", 6) == 0) {
+        const char *ms_str = line + 6;
+        while (*ms_str == ' ') ms_str++; 
+ 
+        int ms = atoi(ms_str);
+        if (ms < 50 || ms > 5000) {
+            printf("invalid blink period: %d ms. Must be between 50 and 5000 ms.\n", ms);
+            return;
+        }
+ 
+        st->mode = LED_MODE_BLINK;
+        st->blink_ms = ms;
+        printf("LED set to blink with a period of %d ms.\n", ms);
+    } else {
+        printf("Invalid command format for blink.\n");
+    }
+ 
+}
+ 
 static void cli_handle_line(cli_state_t *st, const char *line)
 {
     // Trim leading spaces (already done for you)
@@ -208,30 +228,33 @@ static void cli_handle_line(cli_state_t *st, const char *line)
         printf("(empty command)\n");
         return;
     }
-
     // TODO: M3 - Implement exact command matching for:
     //       "help", "led on", "led off", "status", "about"
-    
+    if (strncmp(line, "help", 4)){
+        cli_print_help();
+    }
+    if (strncmp(line, "led on", 6)){
+        led_set_raw(1);
+    }
+    if (strncmp(line, "led off", 7)){
+        led_set_raw(0);
+    }
+    if (strncmp(line, "status", 6)){
+        //TODO
+    }
+    if (strncmp(line, "about", 5)){
+        //TODO
+    }
+
     // TODO: M4 - Implement parameter parsing for:
     //       "blink <ms>" (hint: use strncmp, skip whitespace, use atoi)
-    static void cli_blink_command(cli_state_t *st, const char *line)
-    {
-        if (strncmp(line, "blink ", 6) == 0) {
-            const char *ms_str = line + 6;
-            while (*ms_str == ' ') ms_str++; 
+    if (strncmp(line, "blink ", 6)){
+        //TODO
+    }
+    return;
+
     
-            int ms = atoi(ms_str);
-            if (ms < 50 || ms > 5000) {
-                printf("invalid blink period: %d ms. Must be between 50 and 5000 ms.\n", ms);
-                return;
-            }
     
-            st->mode = LED_MODE_BLINK;
-            st->blink_ms = ms;
-            printf("LED set to blink with a period of %d ms.\n", ms);
-        } else {
-            printf("Invalid command format for blink.\n");
-        }
     
     }
     
