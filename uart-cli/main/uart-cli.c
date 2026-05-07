@@ -104,22 +104,23 @@ static void uart_init(void)
 
 static int read_line(char *buf, int len)
 {
-	int position = 0;
-	char c;
-	while (position < (len - 1)) {
-		c = read_one_byte_from_uart();
-		if (c == '\0') continue;
+        int position = 0;
+        char c;
 
-		write_character_to_uart(c);
+        while (position < (len - 1)) {
+                int n = uart_read_bytes(UART_PORT, &c, 1, 10);
+                if (n <= 0 || c == '\0') continue;
 
-		if(c == '\r' || c == '\n') break;
+                uart_write_bytes(UART_PORT, &c, 1);
 
-		buf[position] = c;
-		position++;
-	}
+                if(c == '\r' || c == '\n') break;
 
-	buf[position] = '\0';
-	return position;
+                buf[position] = c;
+                position++;
+        }
+
+        buf[position] = '\0';
+        return position;
 }
 /*
 
